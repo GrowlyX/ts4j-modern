@@ -1,18 +1,5 @@
 package com.xafero.ts4j;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
-
-import org.apache.commons.io.IOUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -20,16 +7,28 @@ import com.google.gson.JsonObject;
 import com.xafero.ts4j.core.MemoryFS;
 import com.xafero.ts4j.proxy.Container;
 import com.xafero.ts4j.proxy.Node;
+import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import javax.script.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 public class TypeScriptCompiler {
 
-	public static final Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
+	public static final Gson gson = new GsonBuilder()
+		.setPrettyPrinting().create();
+
 	public static final String tsconfig = "tsconfig.json";
-	public static final String libdts = "lib.d.ts";
-	public static final String libcoredts = "lib.core.d.ts";
 	public static final String compiledjs = "compiled.js";
 	public static final String rawTs = "raw.ts";
 
+	public static final String TS_ASSETS_FOLDER = "com.xafero.ts4j/";
 	private static final String TYPE_SCRIPT = "tsc.js";
 
 	private final Invocable jsEngine;
@@ -38,7 +37,7 @@ public class TypeScriptCompiler {
 	public <T extends ScriptEngine & Compilable & Invocable> TypeScriptCompiler(T js) {
 		try {
 			jsEngine = js;
-			Reader reader = getReader(TYPE_SCRIPT);
+			Reader reader = readAsset(TYPE_SCRIPT);
 			tscScript = js.compile(reader);
 			js.put("exporter", this);
 			tscScript.eval();
@@ -57,6 +56,7 @@ public class TypeScriptCompiler {
 		return compile(IOUtils.toString(reader));
 	}
 
+	@Nullable
 	public String compile(String script) throws ScriptException, IOException {
 		ScriptEngine engine = ((ScriptEngine) jsEngine);
 		engine.put("parent", new Node());
@@ -74,15 +74,14 @@ public class TypeScriptCompiler {
 		engine.put("mysys", sys);
 		engine.eval("ts.sys = mysys");
 		// Inject files
-		sys.push(libdts, getReader(libdts));
-		sys.push(libcoredts, getReader(libcoredts));
+		injectAllFiles(sys);
+		// Generate tsconfig and inject script
 		sys.push(tsconfig, generateTsCfg());
 		sys.push(rawTs, script);
 		// Execute CMD
 		engine.eval("ts.executeCommandLine([])");
 		// Get compiled code
-		String compiledJs = sys.getMemory().get(compiledjs);
-		return compiledJs;
+        return sys.getMemory().get(compiledjs);
 	}
 
 	public String generateTsCfg() {
@@ -100,16 +99,35 @@ public class TypeScriptCompiler {
 		JsonArray array = new JsonArray();
 		array.add(rawTs);
 		json.add("files", array);
-		String txt = gson.toJson(json);
-		return txt;
+        return gson.toJson(json);
 	}
 
-	private static Reader getReader(String path) throws UnsupportedEncodingException {
-		return new InputStreamReader(TypeScriptCompiler.class.getResourceAsStream(path), "UTF-8");
+	public void injectAllFiles(@NotNull MemoryFS memoryFS) throws IOException {
+		final String[] assets = AndroidReflectionUtilities.list(TS_ASSETS_FOLDER);
+
+		for (String asset : assets) {
+			if (!asset.endsWith(".ts") && !asset.endsWith(".js"))
+				continue;
+
+			memoryFS.push(asset, readAsset(asset));
+		}
 	}
 
+	@NotNull
+	@Contract("_ -> new")
+	private static Reader readAsset(@NotNull String path) throws IOException {
+		return new InputStreamReader(
+			Objects.requireNonNull(
+				AndroidReflectionUtilities.open(TS_ASSETS_FOLDER + path)
+			),
+			StandardCharsets.UTF_8
+		);
+	}
+
+	@NotNull
 	@SuppressWarnings("unchecked")
-	public static <S extends ScriptEngine & Compilable & Invocable> TypeScriptCompiler create(ScriptEngine engine) {
+	@Contract("_ -> new")
+	public static <S extends ScriptEngine & Compilable & Invocable> TypeScriptCompiler create(@NotNull ScriptEngine engine) {
 		return new TypeScriptCompiler((S) engine);
 	}
 }
