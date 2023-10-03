@@ -13,13 +13,12 @@ repositories {
     mavenCentral()
 }
 
-dependencies {// https://mvnrepository.com/artifact/org.openjdk.nashorn/nashorn-core
-    implementation("org.openjdk.nashorn:nashorn-core:15.4")
-
-    implementation("org.jetbrains:annotations:24.0.1")
-    implementation(fileTree("ftc-libs"))
+dependencies {
+    compileOnly("org.openjdk.nashorn:nashorn-core:15.4")
+    compileOnly("org.jetbrains:annotations:24.0.1")
+    compileOnly(fileTree("ftc-libs"))
     implementation("commons-io:commons-io:2.14.0")
-    implementation("com.google.code.gson:gson:2.10.1")
+    compileOnly("com.google.code.gson:gson:2.10.1")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
