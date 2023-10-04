@@ -350,7 +350,7 @@ var ts;
     ts.memoize = memoize;
     function formatStringFromArgs(text, args, baseIndex) {
         baseIndex = baseIndex || 0;
-        return text.replace(/{(\d+)}/g, function (match, index) { return args[+index + baseIndex]; });
+        return (text + "").replace(/{(\d+)}/g, function (match, index) { return args[+index + baseIndex]; });
     }
     ts.localizedDiagnosticMessages = undefined;
     function getLocaleSpecificMessage(message) {
@@ -478,7 +478,7 @@ var ts;
     }
     ts.deduplicateSortedDiagnostics = deduplicateSortedDiagnostics;
     function normalizeSlashes(path) {
-        return path.replace(/\\/g, "/");
+        return (path + "").replace(/\\/g, "/");
     }
     ts.normalizeSlashes = normalizeSlashes;
     function getRootLength(path) {
@@ -3977,7 +3977,7 @@ var ts;
     }
     ts.unescapeIdentifier = unescapeIdentifier;
     function makeIdentifierFromModuleName(moduleName) {
-        return ts.getBaseFileName(moduleName).replace(/^(\d)/, "_$1").replace(/\W/g, "_");
+        return (ts.getBaseFileName(moduleName) + "").replace(/^(\d)/, "_$1").replace(/\W/g, "_");
     }
     ts.makeIdentifierFromModuleName = makeIdentifierFromModuleName;
     function isBlockOrCatchScoped(declaration) {
@@ -5196,7 +5196,7 @@ var ts;
         "\u0085": "\\u0085"
     };
     function escapeString(s) {
-        s = escapedCharsRegExp.test(s) ? s.replace(escapedCharsRegExp, getReplacement) : s;
+        s = escapedCharsRegExp.test(s) ? (s + "").replace(escapedCharsRegExp, getReplacement) : s;
         return s;
         function getReplacement(c) {
             return escapedCharsMap[c] || get16BitUnicodeEscapeSequence(c.charCodeAt(0));
@@ -5216,7 +5216,7 @@ var ts;
     var nonAsciiCharacters = /[^\u0000-\u007F]/g;
     function escapeNonAsciiCharacters(s) {
         return nonAsciiCharacters.test(s) ?
-            s.replace(nonAsciiCharacters, function (c) { return get16BitUnicodeEscapeSequence(c.charCodeAt(0)); }) :
+            (s + "").replace(nonAsciiCharacters, function (c) { return get16BitUnicodeEscapeSequence(c.charCodeAt(0)); }) :
             s;
     }
     ts.escapeNonAsciiCharacters = escapeNonAsciiCharacters;
@@ -5306,7 +5306,7 @@ var ts;
     ts.getOwnEmitOutputFilePath = getOwnEmitOutputFilePath;
     function getSourceFilePathInNewDir(sourceFile, host, newDirPath) {
         var sourceFilePath = ts.getNormalizedAbsolutePath(sourceFile.fileName, host.getCurrentDirectory());
-        sourceFilePath = sourceFilePath.replace(host.getCommonSourceDirectory(), "");
+        sourceFilePath = (sourceFilePath + "").replace(host.getCommonSourceDirectory(), "");
         return ts.combinePaths(newDirPath, sourceFilePath);
     }
     ts.getSourceFilePathInNewDir = getSourceFilePathInNewDir;
@@ -5454,7 +5454,7 @@ var ts;
         }
         function writeTrimmedCurrentLine(pos, nextLineStart) {
             var end = Math.min(comment.end, nextLineStart - 1);
-            var currentLineText = currentSourceFile.text.substring(pos, end).replace(/^\s+|\s+$/g, "");
+            var currentLineText = (currentSourceFile.text.substring(pos, end) + "").replace(/^\s+|\s+$/g, "");
             if (currentLineText) {
                 writer.write(currentLineText);
                 if (end !== comment.end) {
@@ -24981,7 +24981,7 @@ var ts;
                 var text = ts.getSourceTextOfNodeFromSourceFile(currentSourceFile, node);
                 var isLast = node.kind === 11 || node.kind === 14;
                 text = text.substring(1, text.length - (isLast ? 1 : 2));
-                text = text.replace(/\r\n?/g, "\n");
+                text = (text + "").replace(/\r\n?/g, "\n");
                 text = ts.escapeString(text);
                 write("\"" + text + "\"");
             }
@@ -29362,7 +29362,7 @@ var ts;
                     result = (result ? result + "\" + ' ' + \"" : "") + ts.escapeString(part);
                 }
                 if (result) {
-                    result = result.replace(/&(\w+);/g, function (s, m) {
+                    result = (result + "").replace(/&(\w+);/g, function (s, m) {
                         if (entities[m] !== undefined) {
                             return String.fromCharCode(entities[m]);
                         }
