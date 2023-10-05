@@ -28,6 +28,9 @@ public class TypeScriptCompiler {
 	public static final String compiledjs = "compiled.js";
 	public static final String rawTs = "raw.ts";
 
+	public static final String libdts = "lib.d.ts";
+	public static final String libcoredts = "lib.core.d.ts";
+
 	public static final String TS_ASSETS_FOLDER = "com.xafero.ts4j/";
 	private static final String TYPE_SCRIPT = "tsc.js";
 
@@ -74,7 +77,8 @@ public class TypeScriptCompiler {
 		engine.put("mysys", sys);
 		engine.eval("ts.sys = mysys");
 		// Inject files
-		injectAllFiles(sys);
+		sys.push(libdts, readAsset(libdts));
+		sys.push(libcoredts, readAsset(libcoredts));
 		// Generate tsconfig and inject script
 		sys.push(tsconfig, generateTsCfg());
 		sys.push(rawTs, script);
@@ -100,17 +104,6 @@ public class TypeScriptCompiler {
 		array.add(rawTs);
 		json.add("files", array);
         return gson.toJson(json);
-	}
-
-	public void injectAllFiles(@NotNull MemoryFS memoryFS) throws IOException {
-		final String[] assets = AndroidReflectionUtilities.list(TS_ASSETS_FOLDER);
-
-		for (String asset : assets) {
-			if (!asset.endsWith(".ts") && !asset.endsWith(".js"))
-				continue;
-
-			memoryFS.push(asset, readAsset(asset));
-		}
 	}
 
 	@NotNull

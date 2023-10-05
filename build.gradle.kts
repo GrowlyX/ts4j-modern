@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.liftgate.robotics.ts4j"
-version = "1.0-SNAPSHOT"
+version = "1.7-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ dependencies {
     compileOnly("org.openjdk.nashorn:nashorn-core:15.4")
     compileOnly("org.jetbrains:annotations:24.0.1")
     compileOnly(fileTree("ftc-libs"))
-    implementation("commons-io:commons-io:2.14.0")
+    implementation("commons-io:commons-io:2.4")
     compileOnly("com.google.code.gson:gson:2.10.1")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
