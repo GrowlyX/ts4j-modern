@@ -7,18 +7,18 @@ plugins {
 }
 
 group = "io.liftgate.robotics.ts4j"
-version = "1.7-SNAPSHOT"
+version = "2.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("org.openjdk.nashorn:nashorn-core:15.4")
-    compileOnly("org.jetbrains:annotations:24.0.1")
-    compileOnly(fileTree("ftc-libs"))
+    implementation("io.apisense:rhino-android:1.2.0")
+    implementation("org.jetbrains:annotations:24.0.1")
+    implementation(fileTree("ftc-libs"))
     implementation("commons-io:commons-io:2.4")
-    compileOnly("com.google.code.gson:gson:2.10.1")
+    implementation("com.google.code.gson:gson:2.10.1")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

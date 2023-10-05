@@ -8,15 +8,17 @@ import com.xafero.ts4j.core.MemoryFS;
 import com.xafero.ts4j.proxy.Container;
 import com.xafero.ts4j.proxy.Node;
 import org.apache.commons.io.IOUtils;
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.script.*;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 public class TypeScriptCompiler {
@@ -106,12 +108,15 @@ public class TypeScriptCompiler {
         return gson.toJson(json);
 	}
 
+	private static final Path ASSETS_DATA_DIR =
+		new File(AppUtil.ROBOT_DATA_DIR, "tsassets").toPath();
+
 	@NotNull
 	@Contract("_ -> new")
 	private static Reader readAsset(@NotNull String path) throws IOException {
 		return new InputStreamReader(
-			Objects.requireNonNull(
-				AndroidReflectionUtilities.open(TS_ASSETS_FOLDER + path)
+			Files.newInputStream(
+				new File(ASSETS_DATA_DIR.toFile(), path).toPath()
 			),
 			StandardCharsets.UTF_8
 		);
