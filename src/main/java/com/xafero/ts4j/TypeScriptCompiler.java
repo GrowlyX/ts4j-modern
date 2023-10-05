@@ -115,8 +115,8 @@ public class TypeScriptCompiler {
 	@Contract("_ -> new")
 	private static Reader readAsset(@NotNull String path) throws IOException {
 		return new InputStreamReader(
-			Files.newInputStream(
-				new File(ASSETS_DATA_DIR.toFile(), path).toPath()
+			new FileInputStream(
+				new File(ASSETS_DATA_DIR.toFile(), path)
 			),
 			StandardCharsets.UTF_8
 		);

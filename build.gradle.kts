@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "io.liftgate.robotics.ts4j"
-version = "2.1-SNAPSHOT"
+version = "2.2-SNAPSHOT"
 
 repositories {
     mavenCentral()
